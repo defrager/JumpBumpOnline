@@ -31,8 +31,13 @@ function handler (request, response) {
     			response.end();
     			return;
     		}
-
-    		response.writeHead(200);
+			if (filename.indexOf('.css') > 0) {
+    		  response.writeHead(200, {"Content-Type": "text/css"});
+			} else if (filename.indexOf('.js') > 0) {
+    		  response.writeHead(200, {"Content-Type": "text/javascript"});
+			} else {
+    		  response.writeHead(200);
+			}
     		response.write(file, "binary");
     		response.end();
     	});
