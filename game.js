@@ -101,10 +101,8 @@ function Player(id) {
 
 	this.getPlayerData = function() {
 		return {
-			x: this.x,
-			y: this.y,
-			x_add: this.x_add,
-			y_add: this.y_add,
+			x: Math.floor(this.x),
+			y: Math.floor(this.y),
 			image: this.image,
 			id: this.id,
 			socket: this.socket.id
@@ -527,13 +525,29 @@ function JumpBump(io) {
 		sendMessage('addObject', data); 
 	}
 
-
+	var lastUpdate = []
 	function sendUpdatePlayers() {
 		var data = [];
 		for (var i = 0; i < players.length; ++i) {
 			data.push(players[i].getPlayerData());
 		}
-		sendMessage('updatePlayers', data); 
+		var shouldUpdate = false;
+		if (lastUpdate.length == data.length) {
+			for (var i = 0; i < data.length; i++) {
+				var r = data[i];
+				var l = lastUpdate[i];
+				if (r.x != l.x || r.y != l.y || r.image != l.image) {
+					shouldUpdate = true;
+					break;
+				}
+			}
+		} else {
+			shouldUpdate = true;
+		}
+		if (shouldUpdate) {
+			sendMessage('updatePlayers', data); 
+			lastUpdate = data;
+		}
 	}
 
 	function createNewPlayer(socket) {

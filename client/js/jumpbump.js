@@ -82,38 +82,7 @@ function Player(id) {
 	this.id = id;
 	this.x = 0;
 	this.y = 0;
-	this.x_add = 0;
-	this.y_add = 0;
-	this.direction = rnd(2) ? PlayerDirection.LEFT : PlayerDirection.RIGHT;
-	this.jump_ready = true;
-	this.frame = 0;
-	this.frame_tick = 0;
 	this.image = 0;
-	this.anim = PlayerAnimation.NONE;
-	this.bumps = 0;
-
-	this.setAnimation = function (anim) {
-		this.anim = anim;
-		this.frame = 0;
-		this.frame_tick = 0;
-	}
-
-	this.updateAnimation = function () {
-		this.frame_tick++;
-		var anim = this.anim;
-		var restart_frame = false;
-
-		if (this.frame_tick >= anim.frame[this.frame].ticks) {
-			this.frame++;
-			if (this.frame >= anim.frame.length) {
-				this.frame = anim.restart_frame;
-				restart_frame = true;
-			}
-			this.frame_tick = 0;
-		}
-		this.image = anim.frame[this.frame].image + this.direction * 9;
-		return restart_frame;
-	}
 }
 
 function Sprite() {
@@ -368,8 +337,6 @@ var JumpBump = (function(){
 			}
 			player.x = playerData.x;
 			player.y = playerData.y;
-			player.x_add = playerData.x_add;
-			player.y_add = playerData.y_add;
 			player.socket = playerData.socket;
 			player.image = playerData.image;
 		}
@@ -384,8 +351,6 @@ var JumpBump = (function(){
 		var player = new Player(playerData.id);
 		player.x = playerData.x;
 		player.y = playerData.x;
-		player.x_add = playerData.x_add;
-		player.y_add = playerData.y_add;
 		player.socket = playerData.socket;
 		player.image = playerData.image
 		player.local = true;
