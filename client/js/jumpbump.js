@@ -204,10 +204,12 @@ function Input() {
 	this.bindings = {};
 	this.actions = {};
 	this.onInputActionChanged;
+	this.canvas;
 
-	this.init = function (onInputActionChanged) {
+	this.init = function (canvas, onInputActionChanged) {
 		var input = this;
 		this.onInputActionChanged = onInputActionChanged;
+		this.canvas = canvas;
 		this.bindings[87] = 'move-up';
 		this.bindings[65] = 'move-left';
 		this.bindings[68] = 'move-right';
@@ -218,6 +220,9 @@ function Input() {
 
 		window.addEventListener('keydown', function (event) { input.onKeyDown(event); });
 		window.addEventListener('keyup', function (event) { input.onKeyUp(event); });
+		canvas.addEventListener('touchstart', function (event) { input.onCanvasTouchStartHandler(event); }, false);
+		canvas.addEventListener('touchmove', function (event) { input.onCanvasTouchMoveHandler(event); }, false);
+		canvas.addEventListener('touchend', function (event) { input.onCanvasTouchEndHandler(event); }, false);
 	}
 
 	this.onKeyDown = function (event) {
@@ -234,6 +239,43 @@ function Input() {
 			this.actions[action] = false;
 			this.onInputActionChanged();
 		}
+	}
+
+	this.processTouch = function(event) {
+		var x = event.touches[0].pageX;
+		var y = event.touches[0].pageY;
+				
+		this.actions[x < this.canvas.width / 2 ? 'move-left' : 'move-right'] = true;
+		this.actions['move-up'] = y < this.canvas.height / 2;
+		this.onInputActionChanged();	
+	}	
+	
+	this.onCanvasTouchStartHandler = function (event) {
+		if (event.touches.length == 1) {
+			event.preventDefault();			
+			this.processTouch(event);
+		}
+	}
+	
+	this.onCanvasTouchMoveHandler = function (event) {
+		var lastTouch = this.touch;
+		if (event.touches.length == 1) {
+			event.preventDefault();
+
+			this.processTouch(event);	
+			this.onInputActionChanged();
+		}
+	}
+	
+	this.onCanvasTouchEndHandler = function (event) {
+		this.actions['move-left'] = false;
+		this.actions['move-right'] = false;
+		this.actions['move-up'] = false;
+		if (event.touches.length == 1) {
+			event.preventDefault();			
+			this.processTouch(event);
+		}
+		this.onInputActionChanged();	
 	}
 };
 
@@ -301,7 +343,7 @@ var JumpBump = (function(){
 		window.addEventListener('resize', onWindowResizeHandler, false);
 
 		input = new Input();
-		input.init(onInputActionChanged);
+		input.init(canvas, onInputActionChanged);
 
 		// Force an initial layout
 		onWindowResizeHandler();
