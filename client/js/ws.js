@@ -3,7 +3,7 @@ function Ws(address, port) {
 };
 
 Ws.prototype.init = function (address, port) {
-	this.socket = io.connect('http://localhost');
+	this.socket = io.connect();
 
 	
 	this.socket.on('open', function (e) {
